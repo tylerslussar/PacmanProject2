@@ -68,7 +68,6 @@ class ReflexAgent(Agent):
         to create a masterful evaluation function.
         """
         # Useful information you can extract from a GameState (pacman.py)
-        score = 0
 
         successorGameState = currentGameState.generatePacmanSuccessor(action)
         newPos = successorGameState.getPacmanPosition()
@@ -77,47 +76,32 @@ class ReflexAgent(Agent):
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
         foodList = newFood.asList()
 
-        minGhost = util.manhattanDistance(newPos, newGhostStates[0].getPosition())
-        minFood = util.manhattanDistance(newPos, foodList[0])
+        nearestFood = len(foodList)
+        if len(foodList) != 0:
+            nearestFood = util.manhattanDistance(newPos, foodList[0])
+        nearestGhost = util.manhattanDistance(newPos, newGhostStates[0].getPosition())
 
         for food in foodList:
             foodDistance = util.manhattanDistance(newPos, food)
-            if foodDistance < minFood:
-                minFood = foodDistance
+            if foodDistance < nearestFood:
+                nearestFood = foodDistance
 
         for ghost in newGhostStates:
             ghostDistance = util.manhattanDistance(newPos, ghost.getPosition())
-            if ghostDistance < minGhost:
-                minGhost = ghostDistance
-
-        if minFood < minGhost:
-            score += 1
-        else:
-            score -= 1
-
-        closeToGhost = 0
-        for ghost in newGhostStates:
-            ghostPos = ghost.getPosition()
-
-            if (newPos[0] + 1 == ghostPos[0]) or (newPos[0] - 1 == ghostPos[0]):
-                closeToGhost = -1
-            elif (newPos[1] + 1 == ghostPos[1]) or (newPos[1] - 1 == ghostPos[1]):
-                closeToGhost = -1
-            else:
-                closeToGhost = 0
+            if ghostDistance < nearestGhost:
+                nearestGhost = ghostDistance
 
 
 
 
 
-
-        print(action)
-        print(score)
-        print(successorGameState.getScore())
+        # print(action)
+        # print(successorGameState.getScore())
+        # print(successorGameState.getScore())
 
 
         "*** YOUR CODE HERE ***"
-        return successorGameState.getScore() + minGhost + minFood + closeToGhost
+        return successorGameState.getScore() - nearestFood + nearestGhost
 
 
 def scoreEvaluationFunction(currentGameState: GameState):
@@ -179,7 +163,45 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns whether or not the game state is a losing state
         """
         "*** YOUR CODE HERE ***"
+        print(gameState.getNumAgents())
+        # paccy = gameState.getLegalActions(0)
+        # g = gameState.getLegalActions(1)
+        # print(gameState.getLegalActions(0), "For paccy")
+        # print(gameState.getLegalActions(1), "for g-dawg")
+        # print(gameState.generateSuccessor(0), paccy[0])
+        # print(gameState.generateSuccessor(0), paccy[1])
+        # print(gameState.generateSuccessor(1), g[0])
+        # print(gameState.generateSuccessor(1), g[1])
+        self.buildTree(gameState)
+
+
         util.raiseNotDefined()
+
+    def minimax(self, gameState):
+
+        treeDepth = 0
+        numOfAgents = gameState.getNumAgents()
+        index = 0
+
+        while not (gameState.isWin() or gameState.isLose()):
+           for i in range(self.depth):
+                legalAction = gameState.getLegalActions(index)
+                for action in legalAction:
+                    newGameState = []
+                    newGameState.append(gameState.generateSuccessor(index, action))
+
+    def buildTree(self, gameState: GameState):
+        tree = []
+        index = 0
+        for i in range(self.depth):
+            newGameState = []
+            legalAction = gameState.getLegalActions(index)
+            for action in legalAction:
+                newGameState.append(gameState.generateSuccessor(index, action))
+            tree.append(newGameState)
+            index += 1
+
+
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
