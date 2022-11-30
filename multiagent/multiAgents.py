@@ -292,9 +292,12 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             newGameState = gameState.generateSuccessor(index, action)
             newDepth = depth + 1
             newIndex = (index + 1) % numOfAgents
-            dispatch = self.value(newGameState, newIndex, newDepth, action)
+            dispatch = self.value(newGameState, newIndex, newDepth, action, alpha, beta)
             if dispatch[0] > v[0]:
                 v = (dispatch[0], action)
+            if v[0] > beta:
+                return v
+            alpha = max(alpha, v[0])
 
         return v
 
@@ -307,11 +310,12 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             newGameState = gameState.generateSuccessor(index, action)
             newDepth = depth + 1
             newIndex = (index + 1) % numOfAgents
-            dispatch = self.value(newGameState, newIndex, newDepth, action)
+            dispatch = self.value(newGameState, newIndex, newDepth, action, alpha, beta)
             if dispatch[0] < v[0]:
                 v = (dispatch[0], action)
-            if v < alpha:
-                return
+            if v[0] < alpha:
+                return v
+            beta = min(beta, v[0])
 
 
         return v
@@ -325,9 +329,9 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         elif gameState.isLose():
             return (self.evaluationFunction(gameState), action, alpha, beta)
         elif index == 0:
-            return self.maxValue(gameState, index, depth)
+            return self.maxValue(gameState, index, depth, alpha, beta)
         else:
-            return self.minValue(gameState, index, depth)
+            return self.minValue(gameState, index, depth, alpha, beta)
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
