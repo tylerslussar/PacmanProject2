@@ -162,33 +162,15 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns whether or not the game state is a losing state
         """
         "*** YOUR CODE HERE ***"
-        #print(gameState.getNumAgents())
-        # paccy = gameState.getLegalActions(0)
-        # g = gameState.getLegalActions(1)
-        # print(gameState.getLegalActions(0), "For paccy")
-        # print(gameState.getLegalActions(1), "for g-dawg")
-        # print(gameState.generateSuccessor(0), paccy[0])
-        # print(gameState.generateSuccessor(0), paccy[1])
-        # print(gameState.generateSuccessor(1), g[0])
-        # print(gameState.generateSuccessor(1), g[1])
-        # depth = 0
-        # bestAction = None
-        #
-        # while depth != self.depth:
-        #
-        #     bestAction = self.value(gameState, self.index, self.depth)
-        #     depth += 1
-        #
-        # return bestAction
+
         bestAction = self.maxValue(gameState, 0, 0)
         return bestAction[1]
-       # return self.maxValue(gameState, 0, 0)[1]
 
 
 
     def maxValue(self, gameState, index, depth):
 
-        v = (-(100 ** 100), "")
+        v = (float('-inf'), "")
         legalAction = gameState.getLegalActions(index)
         numOfAgents = gameState.getNumAgents()
         for action in legalAction:
@@ -203,7 +185,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
 
     def minValue(self, gameState, index, depth):
 
-        v = (100 ** 100, "")
+        v = (float('inf'), "")
         legalAction = gameState.getLegalActions(index)
         numOfAgents = gameState.getNumAgents()
         for action in legalAction:
@@ -261,31 +243,16 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         Returns whether or not the game state is a losing state
         """
         "*** YOUR CODE HERE ***"
-        # print(gameState.getNumAgents())
-        # paccy = gameState.getLegalActions(0)
-        # g = gameState.getLegalActions(1)
-        # print(gameState.getLegalActions(0), "For paccy")
-        # print(gameState.getLegalActions(1), "for g-dawg")
-        # print(gameState.generateSuccessor(0), paccy[0])
-        # print(gameState.generateSuccessor(0), paccy[1])
-        # print(gameState.generateSuccessor(1), g[0])
-        # print(gameState.generateSuccessor(1), g[1])
-        # depth = 0
-        # bestAction = None
+
         #
-        # while depth != self.depth:
-        #
-        #     bestAction = self.value(gameState, self.index, self.depth)
-        #     depth += 1
-        #
-        # return bestAction
-        bestAction = self.maxValue(gameState, 0, 0, -(100 ** 100), 100 ** 100)
+
+        bestAction = self.maxValue(gameState, 0, 0, float('-inf'), float('inf'))
         return bestAction[1]
         # return self.maxValue(gameState, 0, 0)[1]
 
     def maxValue(self, gameState, index, depth, alpha, beta):
 
-        v = (-(100 ** 100), "")
+        v = (float('-inf'), "")
         legalAction = gameState.getLegalActions(index)
         numOfAgents = gameState.getNumAgents()
         for action in legalAction:
@@ -303,7 +270,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
 
     def minValue(self, gameState, index, depth, alpha, beta):
 
-        v = (100 ** 100, "")
+        v = (float('inf'), "")
         legalAction = gameState.getLegalActions(index)
         numOfAgents = gameState.getNumAgents()
         for action in legalAction:
