@@ -90,17 +90,10 @@ class ReflexAgent(Agent):
             if ghostDistance < nearestGhost:
                 nearestGhost = ghostDistance
 
-
-
-
-
-        # print(action)
-        # print(successorGameState.getScore())
-        # print(successorGameState.getScore())
-
+        timer = newScaredTimes[0]
 
         "*** YOUR CODE HERE ***"
-        return successorGameState.getScore() - nearestFood + nearestGhost
+        return successorGameState.getScore() + 1/(nearestFood + 1) - 1/(nearestGhost + 1) + 1/(timer + 1)
 
 
 def scoreEvaluationFunction(currentGameState: GameState):
