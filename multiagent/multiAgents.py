@@ -1,5 +1,4 @@
-# multiAgents.py
-# --------------
+# multgameState=None-------------
 # Licensing Information:  You are free to use or extend these projects for
 # educational purposes provided that (1) you do not distribute or publish
 # solutions, (2) you retain this notice, and (3) you provide clear
@@ -163,7 +162,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns whether or not the game state is a losing state
         """
         "*** YOUR CODE HERE ***"
-        print(gameState.getNumAgents())
+        #print(gameState.getNumAgents())
         # paccy = gameState.getLegalActions(0)
         # g = gameState.getLegalActions(1)
         # print(gameState.getLegalActions(0), "For paccy")
@@ -172,34 +171,57 @@ class MinimaxAgent(MultiAgentSearchAgent):
         # print(gameState.generateSuccessor(0), paccy[1])
         # print(gameState.generateSuccessor(1), g[0])
         # print(gameState.generateSuccessor(1), g[1])
-        self.buildTree(gameState)
-
+        # depth = 0
+        # bestAction = None
+        #
+        # while depth != self.depth:
+        #
+        #     bestAction = self.value(gameState, self.index, self.depth)
+        #     depth += 1
+        #
+        # return bestAction
+        return self.maxValue(gameState, self.index, self.depth)
 
         util.raiseNotDefined()
 
-    def minimax(self, gameState):
 
-        treeDepth = 0
+    def maxValue(self, gameState, index, depth):
+
+        v = -(1000 ** 100)
+
         numOfAgents = gameState.getNumAgents()
-        index = 0
+        legalAction = gameState.getLegalActions(index)
+        for action in legalAction:
+            newGameState = gameState.generateSuccessor(index, action)
+            newDepth = depth + 1
+            v = max(v, self.value(newGameState, index + 1, newDepth))
 
-        while not (gameState.isWin() or gameState.isLose()):
-           for i in range(self.depth):
-                legalAction = gameState.getLegalActions(index)
-                for action in legalAction:
-                    newGameState = []
-                    newGameState.append(gameState.generateSuccessor(index, action))
+        return v
 
-    def buildTree(self, gameState: GameState):
-        tree = []
-        index = 0
-        for i in range(self.depth):
-            newGameState = []
-            legalAction = gameState.getLegalActions(index)
-            for action in legalAction:
-                newGameState.append(gameState.generateSuccessor(index, action))
-            tree.append(newGameState)
-            index += 1
+    def minValue(self,gameState, index, depth):
+        v = 1000 ** 100
+
+        numOfAgents = gameState.getNumAgents()
+        legalAction = gameState.getLegalActions(index)
+        for action in legalAction:
+            newGameState = gameState.generateSuccessor(index, action)
+            newDepth = depth + 1
+            v = min(v, self.value(newGameState, index + 1, newDepth))
+
+        return v
+
+    def value(self, gameState, index, depth):
+
+
+        if gameState.isWin():
+            return self.evaluationFunction(gameState)
+        elif gameState.isLose():
+            return self.evaluationFunction(gameState)
+        elif index == 0:
+            return self.maxValue(gameState, index, depth)
+        else:
+            return self.minValue(gameState, index, depth)
+
 
 
 
