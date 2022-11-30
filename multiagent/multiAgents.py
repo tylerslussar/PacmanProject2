@@ -180,43 +180,50 @@ class MinimaxAgent(MultiAgentSearchAgent):
         #     depth += 1
         #
         # return bestAction
-        return self.maxValue(gameState, self.index, self.depth)
+        bestAction = self.maxValue(gameState, 0, 0)
+        return bestAction[1]
+       # return self.maxValue(gameState, 0, 0)[1]
 
-        util.raiseNotDefined()
 
 
     def maxValue(self, gameState, index, depth):
 
-        v = -(1000 ** 100)
-
-        numOfAgents = gameState.getNumAgents()
+        v = (-(100 ** 100), "")
         legalAction = gameState.getLegalActions(index)
+        numOfAgents = gameState.getNumAgents()
         for action in legalAction:
             newGameState = gameState.generateSuccessor(index, action)
             newDepth = depth + 1
-            v = max(v, self.value(newGameState, index + 1, newDepth))
+            newIndex = (index + 1) % numOfAgents
+            dispatch = self.value(newGameState, newIndex, newDepth, action)
+            if dispatch[0] > v[0]:
+                v = (dispatch[0], action)
 
         return v
 
-    def minValue(self,gameState, index, depth):
-        v = 1000 ** 100
+    def minValue(self, gameState, index, depth):
 
-        numOfAgents = gameState.getNumAgents()
+        v = (100 ** 100, "")
         legalAction = gameState.getLegalActions(index)
+        numOfAgents = gameState.getNumAgents()
         for action in legalAction:
             newGameState = gameState.generateSuccessor(index, action)
             newDepth = depth + 1
-            v = min(v, self.value(newGameState, index + 1, newDepth))
+            newIndex = (index + 1) % numOfAgents
+            dispatch = self.value(newGameState, newIndex, newDepth, action)
+            if dispatch[0] < v[0]:
+                v = (dispatch[0], action)
 
         return v
 
-    def value(self, gameState, index, depth):
+    def value(self, gameState, index, depth, action):
 
-
-        if gameState.isWin():
-            return self.evaluationFunction(gameState)
+        if depth >= self.depth * gameState.getNumAgents():
+            return (self.evaluationFunction(gameState), action)
+        elif gameState.isWin():
+            return (self.evaluationFunction(gameState), action)
         elif gameState.isLose():
-            return self.evaluationFunction(gameState)
+            return (self.evaluationFunction(gameState), action)
         elif index == 0:
             return self.maxValue(gameState, index, depth)
         else:
