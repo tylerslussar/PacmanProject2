@@ -11,6 +11,10 @@
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
 
+# multiAgents.py
+# CS 470 Artificial Intelligence
+# Jacob Upchurch & Tyler Slussar
+
 from util import manhattanDistance
 from game import Directions
 import random, util
@@ -76,23 +80,31 @@ class ReflexAgent(Agent):
         foodList = newFood.asList()
 
         nearestFood = len(foodList)
+        # if the foodList is not empty find the distance to the first food in the list
         if len(foodList) != 0:
             nearestFood = util.manhattanDistance(newPos, foodList[0])
+
+        # finds the distance to the first ghost in the list
         nearestGhost = util.manhattanDistance(newPos, newGhostStates[0].getPosition())
 
+        # finding the nearest food to pacman using manhattan distance
         for food in foodList:
             foodDistance = util.manhattanDistance(newPos, food)
             if foodDistance < nearestFood:
                 nearestFood = foodDistance
 
+        # finding the nearest ghost to pacman using manhattan distance
         for ghost in newGhostStates:
             ghostDistance = util.manhattanDistance(newPos, ghost.getPosition())
             if ghostDistance < nearestGhost:
                 nearestGhost = ghostDistance
 
+        # assigning a variable to the value of the scared ghost timer
         timer = newScaredTimes[0]
 
-        "*** YOUR CODE HERE ***"
+
+        # returns the evaluated score
+        # + 1 to the denominator prevents division by 0 therefore the program fully executes
         return successorGameState.getScore() + 1/(nearestFood + 1) - 1/(nearestGhost + 1) + 1/(timer + 1)
 
 
@@ -154,8 +166,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
         gameState.isLose():
         Returns whether or not the game state is a losing state
         """
-        "*** YOUR CODE HERE ***"
-
+        # passing pacman's current gamestate, index, and depth to the max node to proceed the minimax
         bestAction = self.maxValue(gameState, 0, 0)
         return bestAction[1]
 
@@ -163,14 +174,23 @@ class MinimaxAgent(MultiAgentSearchAgent):
 
     def maxValue(self, gameState, index, depth):
 
+        # for max nodes v equals the lowest possible value
+        # empty string is a holder for the action
         v = (float('-inf'), "")
         legalAction = gameState.getLegalActions(index)
         numOfAgents = gameState.getNumAgents()
+       # loops through each legal action that an agent can make
         for action in legalAction:
+            # generate the new gamestate and increases the depth
             newGameState = gameState.generateSuccessor(index, action)
             newDepth = depth + 1
+            # to find the next agent increase index and use modulus to determine
+            # which index's turn
             newIndex = (index + 1) % numOfAgents
+            # use the value (dispatch) function to continue through the game tree based on certain gamestates
             dispatch = self.value(newGameState, newIndex, newDepth, action)
+            # if the returned dispatch value is greater current v
+            # v = (value, current action)
             if dispatch[0] > v[0]:
                 v = (dispatch[0], action)
 
@@ -178,14 +198,23 @@ class MinimaxAgent(MultiAgentSearchAgent):
 
     def minValue(self, gameState, index, depth):
 
+        # for min nodes v equals the largest possible value
+        # empty string is a holder for the action
         v = (float('inf'), "")
         legalAction = gameState.getLegalActions(index)
         numOfAgents = gameState.getNumAgents()
+        # loops through each legal action that an agent can make
         for action in legalAction:
+            # generates new gamestate and increase index
             newGameState = gameState.generateSuccessor(index, action)
             newDepth = depth + 1
+            # to find the next agent increase index and use modulus to determine
+            # which index's turn
             newIndex = (index + 1) % numOfAgents
+            # use the value (dispatch) function to continue through the game tree based on certain gamestates
             dispatch = self.value(newGameState, newIndex, newDepth, action)
+            # if the returned dispatch value is greater current v
+            # v = (value, current action)
             if dispatch[0] < v[0]:
                 v = (dispatch[0], action)
 
@@ -193,12 +222,17 @@ class MinimaxAgent(MultiAgentSearchAgent):
 
     def value(self, gameState, index, depth, action):
 
+        # if self.depth is less than the actual depth
+        # the depth passed in will be checked by seeing if the number of agents all have their own depth
         if depth >= self.depth * gameState.getNumAgents():
             return (self.evaluationFunction(gameState), action)
+        # if the gamestate is a win or lose use evaluationFunction to get a score
         elif gameState.isWin():
             return (self.evaluationFunction(gameState), action)
         elif gameState.isLose():
             return (self.evaluationFunction(gameState), action)
+        # if the index is 0 then it is pacman's turn and he must be the max node
+        # ghost use the min node
         elif index == 0:
             return self.maxValue(gameState, index, depth)
         else:
@@ -235,46 +269,68 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         gameState.isLose():
         Returns whether or not the game state is a losing state
         """
-        "*** YOUR CODE HERE ***"
 
-        #
 
+        # passing pacman's current gamestate, index, and depth to the max node to proceed the minimax
         bestAction = self.maxValue(gameState, 0, 0, float('-inf'), float('inf'))
         return bestAction[1]
-        # return self.maxValue(gameState, 0, 0)[1]
 
     def maxValue(self, gameState, index, depth, alpha, beta):
 
+        # for max nodes v equals the lowest possible value
+        # empty string is a holder for the action
         v = (float('-inf'), "")
         legalAction = gameState.getLegalActions(index)
         numOfAgents = gameState.getNumAgents()
+        # loops through each legal action that an agent can make
         for action in legalAction:
+            # generate the new gamestate and increases the depth
             newGameState = gameState.generateSuccessor(index, action)
             newDepth = depth + 1
+            # to find the next agent increase index and use modulus to determine
+            # which index's turn
             newIndex = (index + 1) % numOfAgents
+            # use the value (dispatch) function to continue through the game tree based on certain gamestates
             dispatch = self.value(newGameState, newIndex, newDepth, action, alpha, beta)
+            # if the returned dispatch value is greater current v
+            # v = (value, current action)
             if dispatch[0] > v[0]:
                 v = (dispatch[0], action)
+            # if v-value is greater than the passed in beta
+            # return the current v pruning any other legal actions
             if v[0] > beta:
                 return v
+            # assign alpha to the newest largest value
             alpha = max(alpha, v[0])
 
         return v
 
     def minValue(self, gameState, index, depth, alpha, beta):
 
+        # for min nodes v equals the largest possible value
+        # empty string is a holder for the action
         v = (float('inf'), "")
         legalAction = gameState.getLegalActions(index)
         numOfAgents = gameState.getNumAgents()
+        # loops through each legal action that an agent can make
         for action in legalAction:
+            # generate the new gamestate and increases the depth
             newGameState = gameState.generateSuccessor(index, action)
             newDepth = depth + 1
+            # to find the next agent increase index and use modulus to determine
+            # which index's turn
             newIndex = (index + 1) % numOfAgents
+            # use the value (dispatch) function to continue through the game tree based on certain gamestates
             dispatch = self.value(newGameState, newIndex, newDepth, action, alpha, beta)
+            # if the returned dispatch value is greater current v
+            # v = (value, current action)
             if dispatch[0] < v[0]:
                 v = (dispatch[0], action)
+            # if v-value is less than the passed in alpha
+            # return the current v pruning any other legal actions
             if v[0] < alpha:
                 return v
+            # assign beta to the newest lowest value
             beta = min(beta, v[0])
 
 
@@ -282,12 +338,17 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
 
     def value(self, gameState, index, depth, action, alpha, beta):
 
+        # if self.depth is less than the actual depth
+        # the depth passed in will be checked by seeing if the number of agents all have their own depth
         if depth >= self.depth * gameState.getNumAgents():
             return (self.evaluationFunction(gameState), action, alpha, beta)
+        # if the gamestate is a win or lose use evaluationFunction to get a score
         elif gameState.isWin():
             return (self.evaluationFunction(gameState), action, alpha, beta)
         elif gameState.isLose():
             return (self.evaluationFunction(gameState), action, alpha, beta)
+        # if the index is 0 then it is pacman's turn and he must be the max node
+        # ghost use the min node
         elif index == 0:
             return self.maxValue(gameState, index, depth, alpha, beta)
         else:
